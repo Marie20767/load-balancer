@@ -5,38 +5,28 @@ import (
 	"log"
 	"os"
 
-	"github.com/Marie20767/go-web-app-template/api/routes"
-	"github.com/Marie20767/go-web-app-template/internal/store"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
-	_ "github.com/lib/pq"
 )
+
+func loadBalancer(c echo.Context) error {
+	// TODO: route to one of the servers with round robin or first without
+}
 
 func run() error {
 	if err := godotenv.Load(); err != nil {
 		return err
 	}
 
-	dbURL := os.Getenv("DATABASE_URL")
 	port := os.Getenv("PORT")
-	if dbURL == "" || port == "" {
+	if port == "" {
 		return errors.New("not all environment variables are set")
 	}
 
-	db, err := store.NewStore(dbURL)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-	log.Println("connected to DB successfully!")
-
 	e := echo.New()
-	routes.RegisterAll(e, db)
-	if err := e.Start(":" + port); err != nil {
-		return err
-	}
+	e.GET("*", loadBalancer)
 
-	return nil
+	return e.Start(":" + port)
 }
 
 func main() {
