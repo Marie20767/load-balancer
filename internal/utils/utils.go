@@ -2,9 +2,11 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	config "github.com/Marie20767/load-balancer/internal"
 	"github.com/joho/godotenv"
@@ -19,7 +21,7 @@ func CustomErrHandler(err error, c echo.Context) {
 	var code int
 	var msg string
 
-	if _, isURLError := err.(*url.Error); isURLError {
+	if _, isUrlError := err.(*url.Error); isUrlError {
 		code = http.StatusBadGateway
 		msg = "Bad Gateway: " + err.Error()
 	} else {
@@ -41,11 +43,11 @@ func ParseEnv() (c *config.Config, err error) {
 		return nil, errors.New("port environment variable not set")
 	}
 
-	s1_URL := os.Getenv("SERVER_1_URL")
-	s2_URL := os.Getenv("SERVER_2_URL")
-	s3_URL := os.Getenv("SERVER_3_URL")
+	s1_Url := os.Getenv("SERVER_1_Url")
+	s2_Url := os.Getenv("SERVER_2_Url")
+	s3_Url := os.Getenv("SERVER_3_Url")
 
-	if s1_URL == "" || s2_URL == "" || s3_URL == "" {
+	if s1_Url == "" || s2_Url == "" || s3_Url == "" {
 		return nil, errors.New("server_url environment variables not set")
 	}
 
@@ -57,13 +59,15 @@ func ParseEnv() (c *config.Config, err error) {
 		return nil, errors.New("server_port environment variables not set")
 	}
 
+	urls := []string{
+		fmt.Sprintf("%s:%s", s1_Url, s1_port),
+		fmt.Sprintf("%s:%s", s2_Url, s2_port),
+		fmt.Sprintf("%s:%s", s3_Url, s3_port),
+	}
+	urlList := strings.Join(urls, ", ")
+
 	return &config.Config{
-		Port:    port,
-		S1_url:  s1_URL,
-		S1_port: s1_port,
-		S2_url:  s2_URL,
-		S2_port: s2_port,
-		S3_url:  s1_URL,
-		S3_port: s1_URL,
+		Port: port,
+		Urls: urlList,
 	}, nil
 }

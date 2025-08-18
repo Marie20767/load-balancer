@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strings"
 
 	config "github.com/Marie20767/load-balancer/internal"
 	"github.com/Marie20767/load-balancer/internal/utils"
@@ -26,7 +26,7 @@ func NewLoadBalancer() (lb *LoadBalancer, err error) {
 
 	return &LoadBalancer{
 		config:  newConfig,
-		counter: 0,
+		counter: 1,
 	}, nil
 }
 
@@ -34,15 +34,22 @@ func (lb *LoadBalancer) Handle() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		req := c.Request()
 
-		target := fmt.Sprintf("%s:%s", lb.config.S1_url, lb.config.S1_port)
-		targetURL, err := url.Parse(target)
+		if lb.counter == len(lb.config.Urls) {
+			lb.counter = 1
+		}
+
+		urls := strings.Split(lb.config.Urls, ",")
+
+		targetUrl, err := url.Parse(urls[lb.counter])
 		if err != nil {
 			return err
 		}
 
-		proxy := httputil.NewSingleHostReverseProxy(targetURL)
+		proxy := httputil.NewSingleHostReverseProxy(targetUrl)
 		req.Header.Set("X-Forwarded-For", c.RealIP())
 		proxy.ServeHTTP(c.Response(), req)
+
+		lb.counter++
 
 		return nil
 	}
