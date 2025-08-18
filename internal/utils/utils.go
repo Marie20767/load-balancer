@@ -64,7 +64,7 @@ func ParseEnv() (c *config.Config, err error) {
 		fmt.Sprintf("%s:%s", s2_Url, s2_port),
 		fmt.Sprintf("%s:%s", s3_Url, s3_port),
 	}
-	urlList := strings.Join(urls, ", ")
+	urlList := strings.Join(urls, ",")
 
 	return &config.Config{
 		Port: port,

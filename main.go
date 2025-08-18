@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http/httputil"
 	"net/url"
@@ -26,7 +27,7 @@ func NewLoadBalancer() (lb *LoadBalancer, err error) {
 
 	return &LoadBalancer{
 		config:  newConfig,
-		counter: 1,
+		counter: 0,
 	}, nil
 }
 
@@ -34,13 +35,14 @@ func (lb *LoadBalancer) Handle() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		req := c.Request()
 
-		if lb.counter == len(lb.config.Urls) {
-			lb.counter = 1
-		}
-
 		urls := strings.Split(lb.config.Urls, ",")
 
+		if lb.counter > len(urls)-1 {
+			lb.counter = 0
+		}
+
 		targetUrl, err := url.Parse(urls[lb.counter])
+
 		if err != nil {
 			return err
 		}
