@@ -43,7 +43,8 @@ func TestRoundRobinLb(t *testing.T) {
 		lb, err := roundrobinlb.NewLoadBalancer(p, s)
 		assert.NoError(t, err)
 
-		lb.WeightedRoundRobin()
+		_, err = lb.WeightedRoundRobin()
+		assert.NoError(t, err)
 		URL, err := lb.WeightedRoundRobin()
 		expected := s[1].URL
 
@@ -61,8 +62,10 @@ func TestRoundRobinLb(t *testing.T) {
 		lb, err := roundrobinlb.NewLoadBalancer(p, s)
 		assert.NoError(t, err)
 
-		lb.WeightedRoundRobin()
-		lb.WeightedRoundRobin()
+		_, err = lb.WeightedRoundRobin()
+		assert.NoError(t, err)
+		_, err = lb.WeightedRoundRobin()
+		assert.NoError(t, err)
 		URL, err := lb.WeightedRoundRobin()
 		expected := s[2].URL
 
