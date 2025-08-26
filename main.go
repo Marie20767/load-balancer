@@ -1,74 +1,41 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http/httputil"
-	"net/url"
 	"os"
-	"strings"
 
+	serverConfig "github.com/Marie20767/load-balancer/cmd/server/config"
 	config "github.com/Marie20767/load-balancer/internal"
+	"github.com/Marie20767/load-balancer/internal/load_balancer/round_robin"
 	"github.com/Marie20767/load-balancer/internal/utils"
 	"github.com/labstack/echo/v4"
 )
 
-type LoadBalancer struct {
-	config  *config.Config
-	counter int
-}
-
-func NewLoadBalancer() (lb *LoadBalancer, err error) {
-	newConfig, err := utils.ParseEnv()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &LoadBalancer{
-		config:  newConfig,
-		counter: 0,
-	}, nil
-}
-
-func (lb *LoadBalancer) Handle() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		req := c.Request()
-
-		urls := strings.Split(lb.config.Urls, ",")
-
-		if lb.counter > len(urls)-1 {
-			lb.counter = 0
-		}
-
-		targetUrl, err := url.Parse(urls[lb.counter])
-
-		if err != nil {
-			return err
-		}
-
-		proxy := httputil.NewSingleHostReverseProxy(targetUrl)
-		req.Header.Set("X-Forwarded-For", c.RealIP())
-		proxy.ServeHTTP(c.Response(), req)
-
-		lb.counter++
-
-		return nil
-	}
-}
-
 func run() error {
 	e := echo.New()
 	e.HTTPErrorHandler = utils.CustomErrHandler
-	loadBalancer, err := NewLoadBalancer()
+
+	c, err := config.ParseEnv()
 
 	if err != nil {
 		return err
 	}
 
-	e.Any("/*", loadBalancer.Handle())
+	s, err := serverConfig.LoadConfig()
 
-	return e.Start(":" + loadBalancer.config.Port)
+	if err != nil {
+		return err
+	}
+
+	lb, err := roundrobinlb.NewLoadBalancer(c.Port, s)
+
+	if err != nil {
+		return err
+	}
+
+	e.Any("/*", lb.Handle())
+
+	return e.Start(":" + c.Port)
 }
 
 func main() {
