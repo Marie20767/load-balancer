@@ -4,9 +4,8 @@ import (
 	"log"
 	"os"
 
-	serverConfig "github.com/Marie20767/load-balancer/cmd/server/config"
-	config "github.com/Marie20767/load-balancer/internal"
-	"github.com/Marie20767/load-balancer/internal/load_balancer/round_robin"
+	"github.com/Marie20767/load-balancer/internal"
+	"github.com/Marie20767/load-balancer/internal/load_balancer/weighted_robin"
 	"github.com/Marie20767/load-balancer/internal/utils"
 	"github.com/labstack/echo/v4"
 )
@@ -21,13 +20,13 @@ func run() error {
 		return err
 	}
 
-	s, err := serverConfig.LoadConfig()
+	s, err := config.LoadConfig()
 
 	if err != nil {
 		return err
 	}
 
-	lb, err := roundrobinlb.NewLoadBalancer(c.Port, s)
+	lb, err := weightedrobin.NewLoadBalancer(c.Port, s)
 
 	if err != nil {
 		return err

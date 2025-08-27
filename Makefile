@@ -1,4 +1,4 @@
-PORTS=$(shell go run scripts/ports/main.go)
+PORTS=$(shell go run cmd/ports/main.go)
 
 start:
 	go run main.go

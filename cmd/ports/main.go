@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Marie20767/load-balancer/cmd/server/config"
+	"github.com/Marie20767/load-balancer/internal"
 )
 
 func main() {

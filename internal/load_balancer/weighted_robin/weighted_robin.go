@@ -1,12 +1,11 @@
-package roundrobinlb
+package weightedrobin
 
 import (
 	"errors"
 	"net/http/httputil"
 	"net/url"
 
-	serverconfig "github.com/Marie20767/load-balancer/cmd/server/config"
-
+	"github.com/Marie20767/load-balancer/internal"
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,13 +15,13 @@ var (
 )
 
 type LoadBalancer struct {
-	servers []serverconfig.Server
+	servers []config.Server
 	weights int
 	port    string
 	counter int
 }
 
-func NewLoadBalancer(port string, servers []serverconfig.Server) (*LoadBalancer, error) {
+func NewLoadBalancer(port string, servers []config.Server) (*LoadBalancer, error) {
 	totalWeights := 0
 
 	for _, server := range servers {
@@ -44,7 +43,7 @@ func (lb *LoadBalancer) Handle() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		req := c.Request()
 
-		targetURL, err := lb.WeightedRoundRobin()
+		targetURL, err := lb.WeightedRobin()
 
 		if err != nil {
 			return err
@@ -58,7 +57,7 @@ func (lb *LoadBalancer) Handle() echo.HandlerFunc {
 	}
 }
 
-func (lb *LoadBalancer) WeightedRoundRobin() (*url.URL, error) {
+func (lb *LoadBalancer) WeightedRobin() (*url.URL, error) {
 	if lb.counter > lb.weights {
 		lb.counter = 1
 	}

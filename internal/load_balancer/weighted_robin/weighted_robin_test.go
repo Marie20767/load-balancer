@@ -1,16 +1,16 @@
-package roundrobinlb_test
+package weightedrobin_test
 
 import (
 	"fmt"
 	"testing"
 
-	config "github.com/Marie20767/load-balancer/cmd/server/config"
-	"github.com/Marie20767/load-balancer/internal/load_balancer/round_robin"
+	"github.com/Marie20767/load-balancer/internal"
+	"github.com/Marie20767/load-balancer/internal/load_balancer/weighted_robin"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRoundRobinLb(t *testing.T) {
+func TestWeightedRobin(t *testing.T) {
 	p := "8080"
 	u := "https://server_url_"
 
@@ -22,10 +22,10 @@ func TestRoundRobinLb(t *testing.T) {
 			{URL: fmt.Sprintf("%s3.com", u), Weight: 1},
 		}
 
-		lb, err := roundrobinlb.NewLoadBalancer(p, s)
+		lb, err := weightedrobin.NewLoadBalancer(p, s)
 		assert.NoError(t, err)
 
-		URL, err := lb.WeightedRoundRobin()
+		URL, err := lb.WeightedRobin()
 		expected := s[0].URL
 
 		assert.NoError(t, err)
@@ -40,12 +40,12 @@ func TestRoundRobinLb(t *testing.T) {
 			{URL: fmt.Sprintf("%s3.com", u), Weight: 1},
 		}
 
-		lb, err := roundrobinlb.NewLoadBalancer(p, s)
+		lb, err := weightedrobin.NewLoadBalancer(p, s)
 		assert.NoError(t, err)
 
-		_, err = lb.WeightedRoundRobin()
+		_, err = lb.WeightedRobin()
 		assert.NoError(t, err)
-		URL, err := lb.WeightedRoundRobin()
+		URL, err := lb.WeightedRobin()
 		expected := s[1].URL
 
 		assert.NoError(t, err)
@@ -59,14 +59,14 @@ func TestRoundRobinLb(t *testing.T) {
 			{URL: fmt.Sprintf("%s3.com", u), Weight: 1},
 		}
 
-		lb, err := roundrobinlb.NewLoadBalancer(p, s)
+		lb, err := weightedrobin.NewLoadBalancer(p, s)
 		assert.NoError(t, err)
 
-		_, err = lb.WeightedRoundRobin()
+		_, err = lb.WeightedRobin()
 		assert.NoError(t, err)
-		_, err = lb.WeightedRoundRobin()
+		_, err = lb.WeightedRobin()
 		assert.NoError(t, err)
-		URL, err := lb.WeightedRoundRobin()
+		URL, err := lb.WeightedRobin()
 		expected := s[2].URL
 
 		assert.NoError(t, err)
@@ -80,7 +80,7 @@ func TestRoundRobinLb(t *testing.T) {
 			{URL: fmt.Sprintf("%s3.com", u), Weight: 1},
 		}
 
-		_, err := roundrobinlb.NewLoadBalancer(p, s)
-		assert.ErrorIs(t, err, roundrobinlb.ErrWeight)
+		_, err := weightedrobin.NewLoadBalancer(p, s)
+		assert.ErrorIs(t, err, weightedrobin.ErrWeight)
 	})
 }
