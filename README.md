@@ -1,4 +1,4 @@
-I implemented my own load balancer in Go and explored 2 load balancing strategies:
+Implementation of a load balancer in Go, using 2 load balancing algorithms:
 
 - weighted round robin
 - geo-based in combination with consistent haching
