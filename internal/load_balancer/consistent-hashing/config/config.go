@@ -14,7 +14,7 @@ type ServerConfig struct {
 	Servers []Server `json:"servers"`
 }
 
-const hashRingValue = 1
+const HashRingValue = 1
 
 func LoadConfig() ([]Server, error) {
 	f, err := os.Open("hashing.config.json")
@@ -33,7 +33,7 @@ func LoadConfig() ([]Server, error) {
 
 	servers := cfg.Servers
 
-	hashRingPortion := hashRingValue / float32(len(cfg.Servers))
+	hashRingPortion := HashRingValue / float32(len(cfg.Servers))
 
 	for i := range servers {
 		servers[i].Position = float32((i + 1)) * hashRingPortion
