@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Marie20767/load-balancer/internal"
+	"github.com/Marie20767/load-balancer/internal/load_balancer/consistent-hashing/config"
 )
 
 func main() {

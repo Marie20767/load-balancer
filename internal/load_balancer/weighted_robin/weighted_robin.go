@@ -5,7 +5,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/Marie20767/load-balancer/internal"
+	"github.com/Marie20767/load-balancer/internal/load_balancer/weighted_robin/config"
 	"github.com/labstack/echo/v4"
 )
 
@@ -43,7 +43,7 @@ func (lb *LoadBalancer) Handle() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		req := c.Request()
 
-		targetURL, err := lb.WeightedRobin()
+		targetURL, err := lb.PickServer()
 
 		if err != nil {
 			return err
@@ -57,7 +57,7 @@ func (lb *LoadBalancer) Handle() echo.HandlerFunc {
 	}
 }
 
-func (lb *LoadBalancer) WeightedRobin() (*url.URL, error) {
+func (lb *LoadBalancer) PickServer() (*url.URL, error) {
 	if lb.counter > lb.weights {
 		lb.counter = 1
 	}

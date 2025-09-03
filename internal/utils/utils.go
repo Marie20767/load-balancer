@@ -1,9 +1,12 @@
 package utils
 
 import (
+	"errors"
 	"net/http"
 	"net/url"
+	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 )
 
@@ -24,4 +27,24 @@ func CustomErrHandler(err error, c echo.Context) {
 	}
 
 	c.String(code, msg)
+}
+
+type Config struct {
+	Port string
+}
+
+func ParseEnv() (*Config, error) {
+	if err := godotenv.Load(); err != nil {
+		return nil, err
+	}
+
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		return nil, errors.New("port environment variable not set")
+	}
+
+	return &Config{
+		Port: port,
+	}, nil
 }

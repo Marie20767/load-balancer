@@ -4,8 +4,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/Marie20767/load-balancer/internal"
-	"github.com/Marie20767/load-balancer/internal/load_balancer/weighted_robin"
+	"github.com/Marie20767/load-balancer/internal/load_balancer/consistent-hashing"
+	"github.com/Marie20767/load-balancer/internal/load_balancer/consistent-hashing/config"
+
 	"github.com/Marie20767/load-balancer/internal/utils"
 	"github.com/labstack/echo/v4"
 )
@@ -14,7 +15,7 @@ func run() error {
 	e := echo.New()
 	e.HTTPErrorHandler = utils.CustomErrHandler
 
-	c, err := config.ParseEnv()
+	c, err := utils.ParseEnv()
 
 	if err != nil {
 		return err
@@ -26,11 +27,7 @@ func run() error {
 		return err
 	}
 
-	lb, err := weightedrobin.NewLoadBalancer(c.Port, s)
-
-	if err != nil {
-		return err
-	}
+	lb := consistenthashing.NewLoadBalancer(c.Port, s)
 
 	e.Any("/*", lb.Handle())
 
