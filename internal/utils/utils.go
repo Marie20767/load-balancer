@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -26,7 +27,9 @@ func CustomErrHandler(err error, c echo.Context) {
 		msg = err.Error()
 	}
 
-	c.String(code, msg)
+	if err := c.JSON(code, map[string]string{"error": msg}); err != nil {
+		log.Printf("failed to send JSON response: %v", err)
+	}
 }
 
 type Config struct {
