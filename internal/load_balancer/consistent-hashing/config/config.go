@@ -22,7 +22,6 @@ func LoadConfig() ([]Server, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	defer f.Close()
 
 	var cfg ServerConfig
@@ -39,5 +38,5 @@ func LoadConfig() ([]Server, error) {
 		servers[i].Position = float32((i + 1)) * hashRingPortion
 	}
 
-	return cfg.Servers, nil
+	return servers, nil
 }
