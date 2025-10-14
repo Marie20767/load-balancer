@@ -46,12 +46,6 @@ func (lb *LoadBalancer) Handle() echo.HandlerFunc {
 	}
 }
 
-func HashInRange(key string) float32 {
-	hash := crc32.ChecksumIEEE([]byte(key))
-
-	return (float32(hash) / float32(math.MaxUint32)) * config.HashRingValue
-}
-
 func (lb *LoadBalancer) PickServer(ip string) (*url.URL, error) {
 	hash := HashInRange(ip)
 
@@ -62,4 +56,10 @@ func (lb *LoadBalancer) PickServer(ip string) (*url.URL, error) {
 	}
 
 	return nil, ErrNoServer
+}
+
+func HashInRange(key string) float32 {
+	hash := crc32.ChecksumIEEE([]byte(key))
+
+	return (float32(hash) / float32(math.MaxUint32)) * config.HashRingValue
 }
