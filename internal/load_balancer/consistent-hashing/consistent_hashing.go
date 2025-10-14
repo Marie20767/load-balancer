@@ -2,11 +2,12 @@ package consistenthashing
 
 import (
 	"errors"
+	"hash/crc32"
+	"math"
 	"net/http/httputil"
 	"net/url"
 
 	"github.com/Marie20767/load-balancer/internal/load_balancer/consistent-hashing/config"
-	"github.com/Marie20767/load-balancer/internal/load_balancer/consistent-hashing/utils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -43,11 +44,16 @@ func (lb *LoadBalancer) Handle() echo.HandlerFunc {
 
 		return nil
 	}
+}
 
+func HashInRange(key string) float32 {
+	hash := crc32.ChecksumIEEE([]byte(key))
+
+	return (float32(hash) / float32(math.MaxUint32)) * config.HashRingValue
 }
 
 func (lb *LoadBalancer) PickServer(ip string) (*url.URL, error) {
-	hash := utils.HashInRange(ip)
+	hash := HashInRange(ip)
 
 	for _, s := range lb.servers {
 		if hash < s.Position {
