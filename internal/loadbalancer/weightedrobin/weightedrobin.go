@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"sync"
 
-	"github.com/Marie20767/load-balancer/internal/load_balancer/weighted_robin/config"
+	"github.com/Marie20767/load-balancer/internal/loadbalancer/weightedrobin/config"
 	"github.com/labstack/echo/v4"
 )
 
