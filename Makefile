@@ -1,19 +1,21 @@
--include .env
-export $(shell sed 's/=.*//' .env)
+PORTS=$(shell go run cmd/ports/main.go)
 
 start:
 	go run main.go
 
 start-servers:
-	go run cmd/server/main.go --port=$(SERVER_1_PORT) &
-	go run cmd/server/main.go --port=$(SERVER_2_PORT) &
-	go run cmd/server/main.go --port=$(SERVER_3_PORT) &
-	wait
+	@echo "Starting servers..."
+	@for port in $(PORTS); do \
+		echo "Starting server on $$port"; \
+		go run cmd/server/main.go --port=$$port & \
+	done
+	@wait
 
 stop-servers:
-	@lsof -ti tcp:$(SERVER_1_PORT) | xargs kill -9 || true
-	@lsof -ti tcp:$(SERVER_2_PORT) | xargs kill -9 || true
-	@lsof -ti tcp:$(SERVER_3_PORT) | xargs kill -9 || true
+	@echo "Stopping servers..."
+	@for port in $(PORTS); do \
+		lsof -ti tcp:$$port | xargs kill -9 || true; \
+	done
 
 lint:
 	golangci-lint run
