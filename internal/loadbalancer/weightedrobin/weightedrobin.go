@@ -4,8 +4,9 @@ import (
 	"errors"
 	"net/http/httputil"
 	"net/url"
+	"sync"
 
-	"github.com/Marie20767/load-balancer/internal"
+	"github.com/Marie20767/load-balancer/internal/loadbalancer/weightedrobin/config"
 	"github.com/labstack/echo/v4"
 )
 
@@ -18,6 +19,7 @@ type LoadBalancer struct {
 	servers []config.Server
 	weights int
 	port    string
+	mu      sync.Mutex
 	counter int
 }
 
@@ -43,7 +45,7 @@ func (lb *LoadBalancer) Handle() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		req := c.Request()
 
-		targetURL, err := lb.WeightedRobin()
+		targetURL, err := lb.PickServer()
 
 		if err != nil {
 			return err
@@ -57,21 +59,26 @@ func (lb *LoadBalancer) Handle() echo.HandlerFunc {
 	}
 }
 
-func (lb *LoadBalancer) WeightedRobin() (*url.URL, error) {
+func (lb *LoadBalancer) PickServer() (*url.URL, error) {
+	lb.mu.Lock()
+	defer lb.mu.Unlock()
+
 	if lb.counter > lb.weights {
 		lb.counter = 1
 	}
 
-	prevWeight := 0
+	sum := 0
 
-	for i, server := range lb.servers {
-		if i > 0 {
-			prevWeight += lb.servers[i-1].Weight
-		}
+	for _, server := range lb.servers {
+		sum += server.Weight
 
-		if lb.counter <= prevWeight+server.Weight {
+		if lb.counter <= sum {
 			lb.counter++
-			return url.Parse(server.URL)
+			u, err := url.Parse(server.URL)
+			if err != nil {
+				return nil, err
+			}
+			return u, nil
 		}
 	}
 

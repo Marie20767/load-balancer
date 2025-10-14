@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Marie20767/load-balancer/internal"
-	"github.com/Marie20767/load-balancer/internal/load_balancer/weighted_robin"
+	"github.com/Marie20767/load-balancer/internal/loadbalancer/weightedrobin"
+	"github.com/Marie20767/load-balancer/internal/loadbalancer/weightedrobin/config"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestWeightedRobin(t *testing.T) {
 	p := "8080"
-	u := "https://server_url_"
+	u := "https://serverurl"
 
 	t.Run("request should be forwarded to server 1", func(t *testing.T) {
 
@@ -25,7 +25,7 @@ func TestWeightedRobin(t *testing.T) {
 		lb, err := weightedrobin.NewLoadBalancer(p, s)
 		assert.NoError(t, err)
 
-		URL, err := lb.WeightedRobin()
+		URL, err := lb.PickServer()
 		expected := s[0].URL
 
 		assert.NoError(t, err)
@@ -43,9 +43,9 @@ func TestWeightedRobin(t *testing.T) {
 		lb, err := weightedrobin.NewLoadBalancer(p, s)
 		assert.NoError(t, err)
 
-		_, err = lb.WeightedRobin()
+		_, err = lb.PickServer()
 		assert.NoError(t, err)
-		URL, err := lb.WeightedRobin()
+		URL, err := lb.PickServer()
 		expected := s[1].URL
 
 		assert.NoError(t, err)
@@ -62,11 +62,11 @@ func TestWeightedRobin(t *testing.T) {
 		lb, err := weightedrobin.NewLoadBalancer(p, s)
 		assert.NoError(t, err)
 
-		_, err = lb.WeightedRobin()
+		_, err = lb.PickServer()
 		assert.NoError(t, err)
-		_, err = lb.WeightedRobin()
+		_, err = lb.PickServer()
 		assert.NoError(t, err)
-		URL, err := lb.WeightedRobin()
+		URL, err := lb.PickServer()
 		expected := s[2].URL
 
 		assert.NoError(t, err)
