@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/Marie20767/load-balancer/internal/load_balancer/consistent-hashing"
-	"github.com/Marie20767/load-balancer/internal/load_balancer/consistent-hashing/config"
+	"github.com/Marie20767/load-balancer/internal/loadbalancer/consistenthashing"
+	"github.com/Marie20767/load-balancer/internal/loadbalancer/consistenthashing/config"
 
 	"github.com/Marie20767/load-balancer/internal/utils"
 	"github.com/labstack/echo/v4"

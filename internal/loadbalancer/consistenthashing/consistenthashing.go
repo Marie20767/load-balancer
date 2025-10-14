@@ -7,7 +7,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/Marie20767/load-balancer/internal/load_balancer/consistent-hashing/config"
+	"github.com/Marie20767/load-balancer/internal/loadbalancer/consistenthashing/config"
 	"github.com/labstack/echo/v4"
 )
 
